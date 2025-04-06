@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KazakhExpress</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">KazakhExpress</div>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Categories</a>
+      <a href="#">Contact</a>
+      <a href="#">Blog</a>
+    </nav>
+    <div>
+      <span>👤</span>
+      <span>🛒</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <video autoplay muted loop playsinline class="bg-video">
+      <source src="videos/bg.mp4" type="video/mp4" />
+      Ваш браузер не поддерживает видео.
+    </video>
+    <div class="hero-overlay">
+      <h1>KazakhExpress — маркетплейс нового поколения</h1>
+      <p>
+        Покупайте товары со всего мира с быстрой доставкой по Казахстану. Умные рекомендации, персонализированные предложения и инновационная система рейтинга сделают ваш шопинг удобным и выгодным.
+      </p>
+      <div class="search-box">
+        <input type="text" class="search-input" placeholder="Поиск товаров...">
+        <button class="search-button">🔍</button>
+      </div>
+    </div>
+  </section>
+  
+  
+
+  <section class="section">
+    <h2>Featured Products</h2>
+    <div id="featured-list" class="grid grid-4"></div>
+    <button class="load-more" onclick="loadMore('featured')">View All</button>
+  </section>
+
+  <section class="section">
+    <h2>Best Sellers</h2>
+    <div id="bestseller-list" class="grid grid-4"></div>
+    <button class="load-more" onclick="loadMore('bestseller')">View All</button>
+  </section>
+
+  <section class="section">
+    <h2>Recommended For You</h2>
+    <div id="recommended-list" class="grid grid-4"></div>
+    <button class="load-more" onclick="loadMore('recommended')">View All</button>
+  </section>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
