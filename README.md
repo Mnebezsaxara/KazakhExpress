@@ -328,6 +328,276 @@ KazakhExpress - это маркетплейс нового поколения, �
 4. Нажмите "Send"
 5. Проверьте ответ - должно вернуться сообщение об успешном удалении
 
+## Тестирование gRPC сервиса через BloomRPC
+
+### Настройка BloomRPC
+
+1. Скачайте и установите [BloomRPC](https://github.com/bloomrpc/bloomrpc/releases)
+2. Запустите BloomRPC
+3. Импортируйте proto-файлы:
+   - Нажмите на кнопку "+" в левом верхнем углу
+   - Выберите файлы `inventory-service/proto/product.proto` и `inventory-service/proto/category.proto`
+4. В поле "Server Address" укажите: `localhost:50051`
+
+### Тестирование Category Service
+
+#### 1. CreateCategory
+
+```json
+// Метод: inventory.CategoryService/CreateCategory
+{
+    "name": "electronics",
+    "description": "Electronic devices and gadgets"
+}
+
+// Ожидаемый ответ:
+{
+    "id": "generated-id",
+    "name": "electronics",
+    "description": "Electronic devices and gadgets",
+    "product_count": 0,
+    "created_at": "timestamp",
+    "updated_at": "timestamp"
+}
+```
+
+#### 2. GetCategory
+
+```json
+// Метод: inventory.CategoryService/GetCategory
+{
+    "id": "your-category-id"
+}
+
+// Ожидаемый ответ:
+{
+    "category": {
+        "id": "your-category-id",
+        "name": "electronics",
+        "description": "Electronic devices and gadgets",
+        "product_count": 0,
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+```
+
+#### 3. ListCategories
+
+```json
+// Метод: inventory.CategoryService/ListCategories
+{}
+
+// Ожидаемый ответ:
+{
+    "categories": [
+        {
+            "id": "category-id-1",
+            "name": "electronics",
+            "description": "Electronic devices and gadgets",
+            "product_count": 5,
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        },
+        {
+            "id": "category-id-2",
+            "name": "clothing",
+            "description": "Fashion items",
+            "product_count": 3,
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        }
+    ],
+    "total": 2
+}
+```
+
+#### 4. DeleteCategory
+
+```json
+// Метод: inventory.CategoryService/DeleteCategory
+{
+    "id": "your-category-id"
+}
+
+// Ожидаемый ответ:
+{}
+```
+
+### Тестирование Product Service
+
+#### 1. CreateProduct
+
+```json
+// Метод: inventory.ProductService/CreateProduct
+{
+    "name": "iPhone 13",
+    "description": "Latest iPhone model",
+    "price": 499999,
+    "image_url": "https://example.com/iphone13.jpg",
+    "category": "electronics",
+    "stock": 10
+}
+
+// Ожидаемый ответ:
+{
+    "id": "generated-id",
+    "name": "iPhone 13",
+    "description": "Latest iPhone model",
+    "price": 499999,
+    "image_url": "https://example.com/iphone13.jpg",
+    "category": "electronics",
+    "stock": 10,
+    "created_at": "timestamp",
+    "updated_at": "timestamp"
+}
+```
+
+#### 2. GetProduct
+
+```json
+// Метод: inventory.ProductService/GetProduct
+{
+    "id": "your-product-id"
+}
+
+// Ожидаемый ответ:
+{
+    "product": {
+        "id": "your-product-id",
+        "name": "iPhone 13",
+        "description": "Latest iPhone model",
+        "price": 499999,
+        "image_url": "https://example.com/iphone13.jpg",
+        "category": "electronics",
+        "stock": 10,
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+```
+
+#### 3. ListProducts
+
+```json
+// Метод: inventory.ProductService/ListProducts
+{
+    "filter": {
+        "category": "electronics",
+        "min_price": 100000,
+        "max_price": 500000,
+        "page": 1,
+        "limit": 10
+    }
+}
+
+// Ожидаемый ответ:
+{
+    "products": [
+        {
+            "id": "product-id-1",
+            "name": "iPhone 13",
+            "description": "Latest iPhone model",
+            "price": 499999,
+            "image_url": "https://example.com/iphone13.jpg",
+            "category": "electronics",
+            "stock": 10,
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        }
+    ],
+    "total": 1
+}
+```
+
+#### 4. UpdateProduct
+
+```json
+// Метод: inventory.ProductService/UpdateProduct
+{
+    "id": "your-product-id",
+    "product": {
+        "name": "iPhone 13",
+        "description": "Latest iPhone model with updates",
+        "price": 459999,
+        "image_url": "https://example.com/iphone13.jpg",
+        "category": "electronics",
+        "stock": 15
+    }
+}
+
+// Ожидаемый ответ:
+{
+    "product": {
+        "id": "your-product-id",
+        "name": "iPhone 13",
+        "description": "Latest iPhone model with updates",
+        "price": 459999,
+        "image_url": "https://example.com/iphone13.jpg",
+        "category": "electronics",
+        "stock": 15,
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+```
+
+#### 5. DeleteProduct
+
+```json
+// Метод: inventory.ProductService/DeleteProduct
+{
+    "id": "your-product-id"
+}
+
+// Ожидаемый ответ:
+{}
+```
+
+### Сценарии тестирования
+
+1. **Создание и управление категориями:**
+
+   - Создайте новую категорию
+   - Получите список всех категорий
+   - Получите конкретную категорию по ID
+   - Попробуйте удалить категорию
+
+2. **Создание и управление продуктами:**
+
+   - Создайте новый продукт в существующей категории
+   - Получите список всех продуктов
+   - Отфильтруйте продукты по категории
+   - Обновите информацию о продукте
+   - Удалите продукт
+
+3. **Проверка валидации:**
+
+   - Попробуйте создать продукт с отрицательной ценой
+   - Попробуйте создать продукт с отрицательным количеством
+   - Попробуйте создать продукт в несуществующей категории
+
+4. **Проверка фильтрации и пагинации:**
+   - Создайте несколько продуктов
+   - Используйте фильтры по цене
+   - Проверьте работу пагинации
+
+### Обработка ошибок
+
+При тестировании вы можете получить следующие ошибки:
+
+1. `NOT_FOUND` - запрашиваемый ресурс не найден
+2. `INVALID_ARGUMENT` - неверные параметры запроса
+3. `INTERNAL` - внутренняя ошибка сервера
+4. `ALREADY_EXISTS` - ресурс уже существует
+
+### Советы по тестированию
+
+1. Сохраняйте ID созданных ресурсов для использования в последующих запросах
+2. Проверяйте все поля в ответах
+3. Тестируйте граничные случаи (пустые значения, большие числа)
+4. Проверяйте обработку ошибок
+
 ## Структура проекта
 
 ```
