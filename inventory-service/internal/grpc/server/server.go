@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/domain"
+	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/logger"
 	pb "github.com/Mnebezsaxara/KazakhExpress/inventory-service/proto/gen"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -20,7 +21,10 @@ func NewServer(
 	categoryUsecase domain.CategoryUsecase,
 	port int,
 ) *Server {
-	grpcServer := grpc.NewServer()
+	// Создаем gRPC сервер с логированием
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(logger.UnaryServerInterceptor()),
+	)
 
 	productServer := NewProductServer(productUsecase)
 	categoryServer := NewCategoryServer(categoryUsecase, productUsecase)
@@ -28,7 +32,7 @@ func NewServer(
 	pb.RegisterProductServiceServer(grpcServer, productServer)
 	pb.RegisterCategoryServiceServer(grpcServer, categoryServer)
 
-	// Enable reflection for debugging
+	// Включаем reflection для отладки
 	reflection.Register(grpcServer)
 
 	return &Server{
@@ -43,7 +47,7 @@ func (s *Server) Start() error {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
 
-	fmt.Printf("gRPC server listening on port %d\n", s.port)
+	logger.LogInfo("gRPC server listening on port %d", s.port)
 	if err := s.grpcServer.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
 	}
@@ -52,5 +56,6 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) Stop() {
+	logger.LogInfo("Stopping gRPC server...")
 	s.grpcServer.GracefulStop()
 } 

@@ -1,34 +1,33 @@
 package usecase
 
-import "github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/domain"
+import (
+	"context"
 
-type CategoryRepository interface {
-    Insert(category *domain.Category) error
-    FindAll() ([]domain.Category, error)
-    FindByID(id string) (domain.Category, error)
-    Delete(id string) error
-}
+	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/domain"
+)
 
 type CategoryUsecase struct {
-    repo CategoryRepository
+	repo domain.CategoryRepository
 }
 
-func NewCategoryUsecase(r CategoryRepository) *CategoryUsecase {
-    return &CategoryUsecase{repo: r}
+func NewCategoryUsecase(repo domain.CategoryRepository) *CategoryUsecase {
+	return &CategoryUsecase{
+		repo: repo,
+	}
 }
 
-func (uc *CategoryUsecase) CreateCategory(c *domain.Category) error {
-    return uc.repo.Insert(c)
+func (u *CategoryUsecase) Create(ctx context.Context, category *domain.Category) (*domain.Category, error) {
+	return u.repo.Create(ctx, category)
 }
 
-func (uc *CategoryUsecase) GetCategories() ([]domain.Category, error) {
-    return uc.repo.FindAll()
+func (u *CategoryUsecase) GetByID(ctx context.Context, id string) (*domain.Category, error) {
+	return u.repo.GetByID(ctx, id)
 }
 
-func (uc *CategoryUsecase) GetCategoryByID(id string) (domain.Category, error) {
-    return uc.repo.FindByID(id)
+func (u *CategoryUsecase) List(ctx context.Context) ([]*domain.Category, int, error) {
+	return u.repo.List(ctx)
 }
 
-func (uc *CategoryUsecase) RemoveCategory(id string) error {
-    return uc.repo.Delete(id)
+func (u *CategoryUsecase) Delete(ctx context.Context, id string) error {
+	return u.repo.Delete(ctx, id)
 }

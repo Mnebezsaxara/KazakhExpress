@@ -15,7 +15,7 @@ import (
 func main() {
 	col := config.ConnectMongo()
 
-	// Репозитории
+	// Repositories
 	productRepo := repository.NewProductMongo(col)
 	categoryRepo := repository.NewCategoryMongo(col)
 

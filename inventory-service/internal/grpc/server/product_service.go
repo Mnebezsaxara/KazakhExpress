@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/domain"
+	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/logger"
+	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/validator"
 	pb "github.com/Mnebezsaxara/KazakhExpress/inventory-service/proto/gen"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,6 +25,11 @@ func NewProductServer(productUsecase domain.ProductUsecase) *ProductServer {
 }
 
 func (s *ProductServer) CreateProduct(ctx context.Context, req *pb.CreateProductRequest) (*pb.Product, error) {
+	// Валидация входных данных
+	if err := validator.ValidateProduct(req.Name, req.Description, req.Price, int(req.Stock)); err != nil {
+		return nil, err
+	}
+
 	product := &domain.Product{
 		Name:        req.Name,
 		Description: req.Description,
@@ -34,25 +41,35 @@ func (s *ProductServer) CreateProduct(ctx context.Context, req *pb.CreateProduct
 
 	result, err := s.productUsecase.Create(ctx, product)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to create product: %v", err)
+		return nil, logger.LogError("CreateProduct", err)
 	}
 
 	return convertDomainToProtoProduct(result), nil
 }
 
 func (s *ProductServer) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.Product, error) {
+	// Валидация ID
+	if err := validator.ValidateID(req.Id); err != nil {
+		return nil, err
+	}
+
 	product, err := s.productUsecase.GetByID(ctx, req.Id)
 	if err != nil {
 		if err == domain.ErrProductNotFound {
-			return nil, status.Errorf(codes.NotFound, "product not found")
+			return nil, status.Error(codes.NotFound, "product not found")
 		}
-		return nil, status.Errorf(codes.Internal, "failed to get product: %v", err)
+		return nil, logger.LogError("GetProduct", err)
 	}
 
 	return convertDomainToProtoProduct(product), nil
 }
 
 func (s *ProductServer) ListProducts(ctx context.Context, req *pb.ListProductsRequest) (*pb.ListProductsResponse, error) {
+	// Валидация параметров пагинации
+	if err := validator.ValidatePagination(req.Page, req.Limit); err != nil {
+		return nil, err
+	}
+
 	filter := domain.ProductFilter{
 		Category: req.Category,
 		MinPrice: req.MinPrice,
@@ -63,7 +80,7 @@ func (s *ProductServer) ListProducts(ctx context.Context, req *pb.ListProductsRe
 
 	products, total, err := s.productUsecase.List(ctx, filter)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to list products: %v", err)
+		return nil, logger.LogError("ListProducts", err)
 	}
 
 	protoProducts := make([]*pb.Product, len(products))
@@ -78,6 +95,16 @@ func (s *ProductServer) ListProducts(ctx context.Context, req *pb.ListProductsRe
 }
 
 func (s *ProductServer) UpdateProduct(ctx context.Context, req *pb.UpdateProductRequest) (*pb.Product, error) {
+	// Валидация ID
+	if err := validator.ValidateID(req.Id); err != nil {
+		return nil, err
+	}
+
+	// Валидация данных продукта
+	if err := validator.ValidateProduct(req.Name, req.Description, req.Price, int(req.Stock)); err != nil {
+		return nil, err
+	}
+
 	product := &domain.Product{
 		ID:          req.Id,
 		Name:        req.Name,
@@ -91,21 +118,26 @@ func (s *ProductServer) UpdateProduct(ctx context.Context, req *pb.UpdateProduct
 	result, err := s.productUsecase.Update(ctx, product)
 	if err != nil {
 		if err == domain.ErrProductNotFound {
-			return nil, status.Errorf(codes.NotFound, "product not found")
+			return nil, status.Error(codes.NotFound, "product not found")
 		}
-		return nil, status.Errorf(codes.Internal, "failed to update product: %v", err)
+		return nil, logger.LogError("UpdateProduct", err)
 	}
 
 	return convertDomainToProtoProduct(result), nil
 }
 
 func (s *ProductServer) DeleteProduct(ctx context.Context, req *pb.DeleteProductRequest) (*emptypb.Empty, error) {
+	// Валидация ID
+	if err := validator.ValidateID(req.Id); err != nil {
+		return nil, err
+	}
+
 	err := s.productUsecase.Delete(ctx, req.Id)
 	if err != nil {
 		if err == domain.ErrProductNotFound {
-			return nil, status.Errorf(codes.NotFound, "product not found")
+			return nil, status.Error(codes.NotFound, "product not found")
 		}
-		return nil, status.Errorf(codes.Internal, "failed to delete product: %v", err)
+		return nil, logger.LogError("DeleteProduct", err)
 	}
 
 	return &emptypb.Empty{}, nil
