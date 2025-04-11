@@ -1,6 +1,6 @@
 package usecase
 
-import "github.com/Mnebezsaxara/inventory-service/internal/domain"
+import "github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/domain"
 
 type CategoryRepository interface {
     Insert(category *domain.Category) error

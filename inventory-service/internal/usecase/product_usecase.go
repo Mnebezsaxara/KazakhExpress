@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/Mnebezsaxara/inventory-service/internal/domain"
+	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

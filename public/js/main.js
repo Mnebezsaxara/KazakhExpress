@@ -161,7 +161,7 @@ const renderProducts = async (
           <p class="stock">В наличии: ${productStock}</p>
           <button class="add-to-cart" data-id="${productId}">В корзину</button>
         </div>
-      `;
+    `;
       list.appendChild(card);
     });
 

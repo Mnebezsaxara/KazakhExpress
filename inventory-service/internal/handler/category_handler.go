@@ -1,10 +1,11 @@
 package handler
 
 import (
-    "net/http"
-    "github.com/Mnebezsaxara/inventory-service/internal/domain"
-    "github.com/Mnebezsaxara/inventory-service/internal/usecase"
-    "github.com/gin-gonic/gin"
+	"net/http"
+
+	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/domain"
+	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/usecase"
+	"github.com/gin-gonic/gin"
 )
 
 type CategoryHandler struct {

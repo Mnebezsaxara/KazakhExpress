@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/Mnebezsaxara/inventory-service/internal/domain"
+	"github.com/Mnebezsaxara/KazakhExpress/inventory-service/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
