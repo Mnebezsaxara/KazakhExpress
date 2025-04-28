@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "auth-service/proto";
+
+service UserService {
+  rpc RegisterUser(UserRequest) returns (UserResponse);
+  rpc AuthenticateUser(AuthRequest) returns (AuthResponse);
+  rpc GetUserProfile(UserID) returns (UserProfile);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+  rpc DeleteUser(UserID) returns (DeleteResponse);
+}
+
+// Request for registering a user
+message UserRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+// Request for login/authentication
+message AuthRequest {
+  string email = 1;
+  string password = 2;
+}
+
+// Response with JWT token
+message AuthResponse {
+  string token = 1;
+}
+
+// Request with email to fetch, delete, or update user
+message UserID {
+  string email = 1;
+}
+
+// User profile info
+message UserProfile {
+  string name = 1;
+  string email = 2;
+  string role = 3;
+}
+
+// For updating user details
+message UpdateUserRequest {
+  string email = 1;
+  string name = 2;
+  string password = 3;
+  string role = 4;
+}
+
+// Generic success response
+message UserResponse {
+  string message = 1;
+}
+
+// Generic deletion response
+message DeleteResponse {
+  string message = 1;
+}

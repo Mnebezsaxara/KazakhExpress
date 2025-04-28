@@ -1,0 +1,84 @@
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - kazakhexpress_network
+
+  auth-service:
+    build:
+      context: ./service/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+      - "8081:8081"
+    environment:
+      - PORT=50051
+      - HTTP_PORT=8081
+      - MONGO_URI=mongodb://mongodb:27017
+      - DB_NAME=authdb
+      - JWT_SECRET=your-secret-key
+    depends_on:
+      - mongodb
+    networks:
+      - kazakhexpress_network
+
+  inventory-service:
+    build:
+      context: ./service/inventory-service
+      dockerfile: Dockerfile
+    ports:
+      - "50052:50052"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - DB_NAME=inventorydb
+    depends_on:
+      - mongodb
+    networks:
+      - kazakhexpress_network
+
+  order-service:
+    build:
+      context: ./service/order-service
+      dockerfile: Dockerfile
+    ports:
+      - "50053:50053"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - DB_NAME=orderdb
+    depends_on:
+      - mongodb
+    networks:
+      - kazakhexpress_network
+
+  api-gateway:
+    build:
+      context: ./service/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - DB_NAME=authdb
+      - JWT_SECRET=your-secret-key
+      - HTTP_PORT=8082
+      - AUTH_SERVICE_URL=auth-service:50051
+      - INVENTORY_SERVICE_URL=inventory-service:50052
+      - ORDER_SERVICE_URL=order-service:50053
+    depends_on:
+      - mongodb
+      - auth-service
+      - inventory-service
+      - order-service
+    networks:
+      - kazakhexpress_network
+
+networks:
+  kazakhexpress_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
